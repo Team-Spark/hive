@@ -38,10 +38,10 @@ class Room(BaseModel):
 
     def clean(self):
         if self.name:
-            self.name = self.name.replace(" ", "-")
+            self.room_name = self.room_name.replace(" ", "-")
 
     def __str__(self):
-        return self.name
+        return self.room_name
 
 
 class Message(BaseModel):
