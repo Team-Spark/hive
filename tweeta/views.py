@@ -62,9 +62,11 @@ class RoomSet(APIView):
             room_logo_url=data["room_logo_url"],
         )
         instance.save()
+        key = urlsafe_base64_encode(force_bytes(instance.pk))
         instance.members.add(user)
         return Response(
-            {"message": "Room Created Successfully"}, status=status.HTTP_201_CREATED
+            {"message": "Room Created Successfully", "token": key},
+            status=status.HTTP_201_CREATED,
         )
 
     def get(self, request):
@@ -97,6 +99,13 @@ class RoomCreate(ViewSet):
             except Exception as e:
                 my_sweet_response[friend] = f"{e}"
         return Response({"message": my_sweet_response}, status=status.HTTP_200_OK)
+
+    def add_with_link(self, request, uidb64):
+        room_id = force_text(urlsafe_base64_decode(uidb64))
+        room = get_object_or_404(Room, pk=room_id)
+        user = get_object_or_404(User, pk=request.user.pk)
+        room.members.add(user)
+        return Response({"message": "User added to room successfully"})
 
 
 class MessageSet(APIView):
@@ -248,7 +257,7 @@ def send_resetpassword_email(request, email):
 class ResetPassword(APIView):
     serializer_class = ResetPasswordSerializer
 
-    def put(self, request, uidb64, token):
+    def post(self, request, uidb64, token):
         try:
             uid = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)

@@ -36,7 +36,7 @@ class RoomSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ["author", "content", "media_url", "timestamp", "room"]
+        fields = ["pk", "author", "content", "media_url", "timestamp", "room"]
 
 
 class FriendsSerializer(serializers.Serializer):
